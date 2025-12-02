@@ -1,224 +1,148 @@
-# Placement-Version---Bank-Customer-Churn-Predictor.
+Bank Customer Churn Prediction (EDA + Feature Engineering + Stacking Ensemble)
+📌 Project Overview
 
-📘 Bank Customer Churn Analysis 
+This project analyzes bank customer churn using a combination of exploratory data analysis (EDA), feature engineering, and a powerful stacking ensemble model.
+The goal is to identify patterns that lead customers to exit and to build a predictive model that can help the bank improve retention strategies.
 
-A complete walkthrough of understanding, cleaning, exploring, and preparing the dataset for churn prediction.
+📂 Dataset
 
-📝 Project Overview
-
-Customer churn is a major concern for subscription-based and service-driven businesses. This project performs Exploratory Data Analysis (EDA) and data preprocessing on a bank churn dataset to understand customer behavior and prepare the data for machine-learning modeling.
-
-The notebook includes:
-
-Data understanding
-
-Data cleaning
-
-Feature engineering
-
-Outlier handling
-
-Encoding
-
-Scaling
-
-Class imbalance handling
-
-Exploratory insights
-
-Pre-modeling transformations
-
-This README summarizes the process and results in a clean, easy-to-understand format.
-
-📂 1. Dataset Summary
-
-The dataset contains demographic, financial, and behavioral information about bank customers, including whether they churned or stayed.
+Source: Customer data including demographics, account activity, products used, and churn label.
 
 Key Columns
 
-Customer demographics: Gender, Age, Geography
+Demographics: Age, Gender, Geography
 
-Account information: Tenure, Balance, Estimated Salary
+Financial: Balance, Credit Score, Estimated Salary
 
-Behavior: Num of Products, Credit Score, Has Credit Card, Is Active Member
+Behavioral: Tenure, Number of Products, Credit Card Ownership, Active Member Flag
 
 Target: Exited (1 = churned, 0 = stayed)
 
-🧹 2. Data Cleaning & Preparation
-✔ Missing Values
+🔍 Data Cleaning & Preprocessing
 
-No major missing values were found (per the notebook's profiling report).
+Handled duplicates and missing values using SimpleImputer
 
-✔ Duplicate Handling
+Normalized categorical columns (lowercasing, stripping whitespace)
 
-Duplicate records were checked and removed if necessary.
+Dropped ID-like columns not useful for modeling
 
-✔ Data Type Fixes
-
-Categorical features converted to proper categorical types.
-
-✔ Outlier Treatment
-
-Outliers in Age, Balance, CreditScore handled carefully.
-
-Decision: Keep outliers if they represent real customer behavior.
-
-Boxplot distributions examined.
-
-🧩 3. Feature Engineering
-New features created (based on notebook logic):
+Created categorical buckets:
 
 Age groups
 
-Customer activity flags
+CreditScore (FICO categories)
 
-Financial ratio calculations (e.g., balance-to-salary ratio)
+Tenure groups
 
-These features can help improve model learning.
+Engineered interaction features:
 
-🔠 4. Encoding & Transformation
-✔ Categorical Encoding
+Balance-to-Salary Ratio
 
-Gender, Geography → One-Hot Encoding
+Products × Credit Card
 
-Binary flags → mapped to 0/1
+Age × Tenure
 
-✔ Scaling
+Reduced skewness with log transforms for Balance & EstimatedSalary
 
-Numeric columns scaled using StandardScaler
+Used Pipelines & ColumnTransformer to automate:
 
-Important for distance-based models and neural nets
+Numeric: median imputation + scaling
 
-✔ Train/Test Consistency
+Categorical: mode imputation + one-hot encoding
 
-A robust transformation pipeline ensures new unseen customer data can be processed with the same rules.
+📊 Exploratory Data Analysis
 
-⚖ 5. Handling Class Imbalance
+Key findings from EDA:
 
-Customer churn datasets are typically imbalanced (few customers churn).
-The notebook applied:
+Older customers churn more (strongest correlation with Exited)
 
-Oversampling using SMOTE
+Low product usage and inactive membership increase churn
 
-Achieved a more balanced 1:1 ratio
+Geography matters (some countries show higher exit rates)
 
-Ensures models do not become biased toward predicting "not churn"
+Balance and salary are not strong standalone predictors
 
-📊 6. Exploratory Data Analysis (EDA)
-✔ Univariate Analysis
+Dataset is imbalanced (~21% churn)
 
-Histograms and distributions of key variables
+Visualizations included:
 
-Summary statistics
+Histograms for numeric features
 
-Outlier visualization
+Countplots for categorical features
 
-✔ Bivariate Analysis
+Correlation heatmap
 
-Key relationships identified:
+Boxplots (Age vs Churn)
 
-Age vs Churn: Older customers churn more
+Automated HTML profiling report via ydata_profiling
 
-Active Members: Inactive customers have much higher churn
+🤖 Modeling Approach
+Why Stacking Ensemble?
 
-NumOfProducts: Customers with 3–4 products churn significantly
+Different boosting models learn different patterns. Combining them increases stability and accuracy.
 
-Geography Influence: Some regions have higher churn
-
-Balance & Salary: Weak direct relationship with churn
-
-✔ Correlation Heatmap
-
-Identified correlations among:
-
-Age
-
-Tenure
-
-Credit Score
-
-Activity status
-
-Churn
-
-🧠 7. Pre-Modeling Pipeline
-
-The notebook produces a clean ML-ready dataset:
-
-Includes:
-
-Encoded & scaled features
-
-Engineered variables
-
-Balanced target classes
-
-Training/testing split
-
-Output:
-
-X_train, X_test, y_train, y_test
-
-Ready for classification models such as:
-
-Logistic Regression
-
-Random Forest
+Base Models
 
 XGBoost
 
-Gradient Boosting
+LightGBM
 
-Neural Networks
+CatBoost
 
-✅ 8. Project Milestones Completed
+Meta-Learner
 
-✔ Data understanding
-✔ Cleaning & preprocessing
-✔ Exploratory data analysis
-✔ Pandas Profiling report
-✔ Outlier inspection
-✔ Encoders & scalers applied
-✔ SMOTE oversampling
-✔ Feature engineering
-✔ Pipeline for reusability
+Logistic Regression (using base models' predicted probabilities)
 
-📁 9. Project Structure
-.
-├── FINAL_EDA_BANK_CHURN_CORRECTED VERSION.ipynb
-├── README.md
-└── data/
-    └── bank_churn.csv  (not included here)
+Cross-validation: 5-fold
+Input: Sparse encoded features, safely converted to dense when required
+🧪 Evaluation Metrics
 
-🚀 10. Next Steps (Modeling Suggestions)
+Accuracy
 
-Recommended modeling flow:
+Precision
 
-Train baseline Logistic Regression
+Recall
 
-Compare with Random Forest & XGBoost
+F1-score
 
-Tune hyperparameters
+AUC-ROC
 
-Evaluate using:
+These metrics help measure:
 
-Recall (important for churn!)
+the model’s ability to capture churners
 
-F1 score
+probability calibration
 
-ROC-AUC
+performance on imbalanced data
 
-Deploy model or create an inference API
+📈 Results (Typical)
 
-🎯 Summary
+The stacking ensemble achieved strong balanced performance, especially in:
 
-This notebook fully prepares the dataset for predictive churn modeling through a complete EDA and processing pipeline.
-It ensures:
+Recall → identifies actual churners
 
-Cleaned high-quality data
+AUC-ROC → evaluates probability quality
 
-Balanced classes
+This makes it well-suited for churn prediction use cases where catching churners is critical.
 
-Well-structured features
+📁 Project Outputs
 
-Ready-to-train ML inputs
+bank_churn_cleaned.csv — cleaned dataset ready for modeling
+
+bank_churn_data_dictionary.xlsx — documentation of all features
+
+bank_churn_data_quality_report.html — automated EDA report
+
+Visualizations folder (optional)
+
+🧠 Business Insights
+
+Older customers (40+) churn significantly more
+
+Customers with only 1 product are high-risk
+
+Inactive members have higher churn probability
+
+Geography impacts churn — location-based strategies can help
+
+Salary, credit score, and gender have minimal predictive value
