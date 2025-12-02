@@ -1,26 +1,21 @@
-Bank Customer Churn Prediction (EDA + Feature Engineering + Stacking Ensemble)
+📘 Bank Customer Churn Prediction (EDA + Feature Engineering + Stacking Ensemble)
 📌 Project Overview
 
-This project analyzes bank customer churn using a combination of exploratory data analysis (EDA), feature engineering, and a powerful stacking ensemble model.
-The goal is to identify patterns that lead customers to exit and to build a predictive model that can help the bank improve retention strategies.
-
+This project predicts customer churn for a bank using detailed EDA, advanced feature engineering, and a high-performance stacking ensemble model.
+The goal is to identify customers at risk of leaving and provide actionable business insights.
 📂 Dataset
-
-Source: Customer data including demographics, account activity, products used, and churn label.
-
+The dataset contains customer-level information including demographics, financial behavior, product usage, and churn labels.
 Key Columns
 
 Demographics: Age, Gender, Geography
 
-Financial: Balance, Credit Score, Estimated Salary
+Financial: Balance, CreditScore, EstimatedSalary
 
-Behavioral: Tenure, Number of Products, Credit Card Ownership, Active Member Flag
+Behavioral: Tenure, NumOfProducts, HasCrCard, IsActiveMember
 
 Target: Exited (1 = churned, 0 = stayed)
 
-🔍 Data Cleaning & Preprocessing
-
-Handled duplicates and missing values using SimpleImputer
+🧹 Data Cleaning & Preprocessing
 
 Normalized categorical columns (lowercasing, stripping whitespace)
 
@@ -50,38 +45,51 @@ Numeric: median imputation + scaling
 
 Categorical: mode imputation + one-hot encoding
 
-📊 Exploratory Data Analysis
+📊 Exploratory Data Analysis (EDA)
+Key Findings
 
-Key findings from EDA:
+Age is the strongest predictor of churn (older customers churn more)
 
-Older customers churn more (strongest correlation with Exited)
+Customers with only 1 product show much higher churn
 
-Low product usage and inactive membership increase churn
+Inactive customers are at high risk
 
-Geography matters (some countries show higher exit rates)
+Geography significantly affects churn
 
-Balance and salary are not strong standalone predictors
+Salary, credit score, and gender have weak influence
 
-Dataset is imbalanced (~21% churn)
+Dataset is imbalanced (~21% churn, 79% non-churn)
 
-Visualizations included:
+Visualizations Included
 
 Histograms for numeric features
 
 Countplots for categorical features
 
+Boxplots (Age vs Exited)
+
 Correlation heatmap
 
-Boxplots (Age vs Churn)
+Automated profiling report (ydata_profiling)
 
-Automated HTML profiling report via ydata_profiling
+🧪 Feature Engineering
 
-🤖 Modeling Approach
-Why Stacking Ensemble?
+AgeGroup: binned ages (18–30, 31–40, etc.)
 
-Different boosting models learn different patterns. Combining them increases stability and accuracy.
+CreditBucket: FICO score categories
 
-Base Models
+TenureGroup: grouped tenure (0–2, 3–5, 6–10)
+
+BalanceSalaryRatio: financial behavior indicator
+
+Products_Card: engagement feature (products × card)
+
+AgeTenure: lifecycle interaction feature
+
+LogBalance / LogSalary: reduced skew for better modeling
+
+🤖 Modeling
+Base Learners
 
 XGBoost
 
@@ -89,60 +97,63 @@ LightGBM
 
 CatBoost
 
-Meta-Learner
+Stacking Ensemble
 
-Logistic Regression (using base models' predicted probabilities)
+A StackingClassifier with:
 
-Cross-validation: 5-fold
-Input: Sparse encoded features, safely converted to dense when required
-🧪 Evaluation Metrics
+Level-1 models: XGB, LGBM, CatBoost
+
+Level-2 (meta-model): Logistic Regression
+
+predict_proba stacking for richer information
+
+5-fold cross-validation
+
+Sparse-to-dense conversion handled safely
+
+Why Stacking?
+
+Each boosting model captures different patterns.
+Stacking combines them for better generalization and higher accuracy.
+
+📈 Model Evaluation
+
+Metrics used:
 
 Accuracy
 
 Precision
 
-Recall
+Recall (critical for churn)
 
 F1-score
 
-AUC-ROC
+AUC-ROC (best for probability ranking)
 
-These metrics help measure:
-
-the model’s ability to capture churners
-
-probability calibration
-
-performance on imbalanced data
-
-📈 Results (Typical)
-
-The stacking ensemble achieved strong balanced performance, especially in:
+The stacking ensemble demonstrated strong performance, especially in:
 
 Recall → identifies actual churners
 
-AUC-ROC → evaluates probability quality
-
-This makes it well-suited for churn prediction use cases where catching churners is critical.
+AUC-ROC → quality of probability predictions
 
 📁 Project Outputs
 
-bank_churn_cleaned.csv — cleaned dataset ready for modeling
+bank_churn_cleaned.csv — cleaned dataset
 
-bank_churn_data_dictionary.xlsx — documentation of all features
+bank_churn_data_dictionary.xlsx — full documentation of features
 
-bank_churn_data_quality_report.html — automated EDA report
+bank_churn_data_quality_report.html — automated profiling report
 
-Visualizations folder (optional)
+Visualization plots (histograms, countplots, boxplots, heatmaps)
 
 🧠 Business Insights
 
-Older customers (40+) churn significantly more
+Older customers are significantly more likely to churn
 
-Customers with only 1 product are high-risk
+Customers with fewer products are at high churn risk
 
-Inactive members have higher churn probability
+Inactive customers require targeted engagement
 
-Geography impacts churn — location-based strategies can help
+Churn varies by geography, indicating region-specific behavior
 
-Salary, credit score, and gender have minimal predictive value
+Salary, gender, credit score do not meaningfully drive churn
